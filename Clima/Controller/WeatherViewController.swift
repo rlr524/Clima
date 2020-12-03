@@ -2,8 +2,8 @@
 //  ViewController.swift
 //  Clima
 //
-//  Created by Angela Yu on 01/09/2019.
-//  Copyright © 2019 App Brewery. All rights reserved.
+//  Created by Rob Ranf on 12/2/2020.
+//  Copyright © 2020 Emiya Consulting. All rights reserved.
 //
 
 import UIKit
