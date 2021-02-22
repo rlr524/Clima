@@ -10,33 +10,45 @@ import Foundation
 
 struct WeatherManager {
     let weatherURL = "https://api.openweathermap.org/data/2.5/weather?appid=039de1f7c3eb63c700388ab529607ffc&units=metric"
-    
+    // TODO: Need to account for spaces in city names
     func fetchWeather(cityName: String) {
         let urlString = "\(weatherURL)&q=\(cityName)"
         performRequest(urlString: urlString)
         print(urlString)
     }
     
+    /**
+     - Description:
+     1. Create the URL
+     2. Create a URL session
+     3. Give the session a task and use a closure to handle errors and processing of safe data
+     4. Start the task
+     - Parameters: urlString points to our OpenWeatherMap api endpoint
+     */
     func performRequest(urlString: String) {
-        // Create the URL
         if let url = URL(string: urlString) {
-            // Create a URL session
             let session = URLSession(configuration: .default)
-            // Give the session a task
-            let task = session.dataTask(with: url, completionHandler: handle(data:response:error:))
-            // Start the task
+            let task = session.dataTask(with: url) { (data, response, error) in
+                if error != nil {
+                    print(error!)
+                    return
+                }
+                if let safeData = data {
+                    self.parseJSON(weatherData: safeData)
+                }
+            }
             task.resume()
         }
     }
-    
-    func handle(data: Data?, response: URLResponse?, error: Error?) {
-        if error != nil {
-            print(error!)
-            return
-        }
-        if let safeData = data {
-            let dataString = String(data: safeData, encoding: .utf8)
-            print(dataString ?? "There is no data")
+    func parseJSON(weatherData: Data) {
+        let decoder = JSONDecoder()
+        do {
+            let decodedData = try decoder.decode(WeatherData.self, from: weatherData)
+            print(decodedData.name)
+            print(decodedData.main.temp)
+            print(decodedData.weather[0].description)
+        } catch {
+            print(error)
         }
     }
 }
