@@ -14,7 +14,7 @@ struct WeatherManager {
     func fetchWeather(cityName: String) {
         let urlString = "\(weatherURL)&q=\(cityName)"
         performRequest(urlString: urlString)
-        print(urlString)
+        print("URI passed was: \(urlString) ")
     }
     
     /**
@@ -44,9 +44,19 @@ struct WeatherManager {
         let decoder = JSONDecoder()
         do {
             let decodedData = try decoder.decode(WeatherData.self, from: weatherData)
-            print(decodedData.name)
-            print(decodedData.main.temp)
-            print(decodedData.weather[0].description)
+            let id = decodedData.weather[0].id
+            let temp = decodedData.main.temp
+            let locationName = decodedData.name
+            let description = decodedData.weather[0].description
+            
+            let weather = WeatherModel(conditionId: id, cityName: locationName, temperature: temp)
+            
+            print(locationName)
+            print(temp)
+            print(description)
+            print(id)
+            print(weather.conditionName)
+            print("Temp as a string is: \(weather.tempString)")
         } catch {
             print(error)
         }

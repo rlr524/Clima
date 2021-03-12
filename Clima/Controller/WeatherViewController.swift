@@ -17,21 +17,29 @@ class WeatherViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var temperatureLabel: UILabel!
     @IBOutlet weak var cityLabel: UILabel!
     @IBOutlet weak var searchTextField: UITextField!
+    @IBOutlet weak var unitsToggle: UISwitch!
     
     var weatherManager = WeatherManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         /**
-         - Note: We are setting the current ViewController as the delegate for our searchTextField outlet. This allows our searchTextField to communicate with the entire view controller (it can be notified and respond to changes in the vc such as keyboard presses)...this allows us to use our textFieldShouldReturn method below to allow the enter / return / go button to have the same behavior as pressing the magnifying glass icon
+         - Note: We are setting the current ViewController as the delegate for our searchTextField outlet. This allows our searchTextField to communicate with the entire view controller (it can be notified and respond to changes in the vc such as keyboard presses)...this allows us to use our textFieldShouldReturn and textFieldShouldEndEditing / textFieldDidEndEditing methods below to allow the enter / return / go button to have the same behavior as pressing the magnifying glass icon as well as prompt for user input or clear the text field upon entry.
          */
         searchTextField.delegate = self
     }
 
     @IBAction func searchPressed(_ sender: UIButton) {
         let userLocationText = searchTextField.text ?? "Nothing entered"
-        print(userLocationText)
+        print("User entered: \(userLocationText)")
         searchTextField.endEditing(true)
+    }
+    
+    @IBAction func toggleChanged (_ sender: UISwitch) {
+        let unitsImperial = unitsToggle.isOn
+        let unitsMetric = !unitsToggle.isOn
+        print(unitsImperial)
+        print(unitsMetric)
     }
     /**
      - Note: This delegate method with allow the Return key to have the same behavior as the search button
