@@ -9,7 +9,9 @@
 import UIKit
 
 /**
- - Note: We are adopting the UITextFieldDelegate protocol here and in our delegate methods, we are conforming to the protocol
+ - Note: We are adopting the UITextFieldDelegate protocol here and in our delegate methods, we are conforming to the protocol. We are also adopting the WeatherManagerDelegate protocol as defined in
+ our WeatherManager file and conforming to it through our didUpdateWeather function which takes in
+ our data from our WeatherModel.
  */
 class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManagerDelegate {
 
@@ -73,8 +75,12 @@ class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManag
         textField.text = ""
     }
     
-    func didUpdateWeather(weather: WeatherModel) {
+    func didUpdateWeather(_ weatherManager: WeatherManager, weather: WeatherModel) {
         print(weather)
         print("Temp as a string is \(weather.tempString)")
+    }
+    
+    func didFailWithError(error: Error) {
+        print(error)
     }
 }
