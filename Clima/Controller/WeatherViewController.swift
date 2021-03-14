@@ -11,7 +11,7 @@ import UIKit
 /**
  - Note: We are adopting the UITextFieldDelegate protocol here and in our delegate methods, we are conforming to the protocol
  */
-class WeatherViewController: UIViewController, UITextFieldDelegate {
+class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManagerDelegate {
 
     @IBOutlet weak var conditionImageView: UIImageView!
     @IBOutlet weak var temperatureLabel: UILabel!
@@ -27,6 +27,7 @@ class WeatherViewController: UIViewController, UITextFieldDelegate {
          - Note: We are setting the current ViewController as the delegate for our searchTextField outlet. This allows our searchTextField to communicate with the entire view controller (it can be notified and respond to changes in the vc such as keyboard presses)...this allows us to use our textFieldShouldReturn and textFieldShouldEndEditing / textFieldDidEndEditing methods below to allow the enter / return / go button to have the same behavior as pressing the magnifying glass icon as well as prompt for user input or clear the text field upon entry.
          */
         searchTextField.delegate = self
+        weatherManager.delegate = self
     }
 
     @IBAction func searchPressed(_ sender: UIButton) {
@@ -70,5 +71,10 @@ class WeatherViewController: UIViewController, UITextFieldDelegate {
             weatherManager.fetchWeather(cityName: city)
         }
         textField.text = ""
+    }
+    
+    func didUpdateWeather(weather: WeatherModel) {
+        print(weather)
+        print("Temp as a string is \(weather.tempString)")
     }
 }
