@@ -75,9 +75,23 @@ class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManag
         textField.text = ""
     }
     
+    /**
+     - Note: Because this is part of a completion handler (handles a long running task, most commonly network
+     operations such as api calls) we cannot directly update our UI from inside of it, e.g. with temperatureLabel.text = weather.tempString.
+     We have to use the DispatchQueue class and handle it asynchronously because the updates to our UI are entirely
+     dependent upon the api data being updated and returned.
+     - Description: Remember this is a closure because we are calling it inside our performRequest function in our WeatherManager
+     struct by storing it in a variable; that performRequest function is what is doing our network operation and this function
+     runs at the end of that operation making it part of a completion handler...i.e. it "handles" completion of the network function. Our function
+     didFailWithError is part of the completion handler too (and a closure), but we would, of course, never attempt to update our UI from inside it
+     as it's only job is handle completion of our network request in the case of an error.
+     */
     func didUpdateWeather(_ weatherManager: WeatherManager, weather: WeatherModel) {
-        print(weather)
-        print("Temp as a string is \(weather.tempString)")
+        DispatchQueue.main.async {
+            self.temperatureLabel.text = weather.tempString
+            self.cityLabel.text = weather.cityName
+            self.conditionImageView.image = UIImage(systemName: weather.conditionName)
+        }
     }
     
     func didFailWithError(error: Error) {
