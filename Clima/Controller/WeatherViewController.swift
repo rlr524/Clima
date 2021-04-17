@@ -7,31 +7,59 @@
  */
 
 import UIKit
+import CoreLocation
 
-/**
- - Note: We are adopting the UITextFieldDelegate protocol here and in our delegate methods, we are conforming to the protocol. We are also adopting the WeatherManagerDelegate protocol as defined in
- our WeatherManager file and conforming to it through our didUpdateWeather function which takes in
- our data from our WeatherModel.
- */
-class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManagerDelegate {
-
+class WeatherViewController: UIViewController {
+    
     @IBOutlet weak var conditionImageView: UIImageView!
     @IBOutlet weak var temperatureLabel: UILabel!
     @IBOutlet weak var cityLabel: UILabel!
     @IBOutlet weak var searchTextField: UITextField!
     @IBOutlet weak var unitsToggle: UISwitch!
+
     
-    var weatherManager = WeatherManager()
+    
+    var weatherManager: WeatherManager?
+    var locationManager: CLLocationManager?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         /**
+         - Note: We are using the CoreLocation CLLocationManager to access the user's location
+         */
+        locationManager = CLLocationManager()
+        locationManager?.delegate = self
+        locationManager?.requestWhenInUseAuthorization()
+        locationManager?.requestLocation()
+        /**
          - Note: We are setting the current ViewController as the delegate for our searchTextField outlet. This allows our searchTextField to communicate with the entire view controller (it can be notified and respond to changes in the vc such as keyboard presses)...this allows us to use our textFieldShouldReturn and textFieldShouldEndEditing / textFieldDidEndEditing methods below to allow the enter / return / go button to have the same behavior as pressing the magnifying glass icon as well as prompt for user input or clear the text field upon entry.
          */
+        weatherManager = WeatherManager()
         searchTextField.delegate = self
-        weatherManager.delegate = self
+        weatherManager?.delegate = self
     }
+    @IBAction func locationPressed(_ sender: UIButton) {
+        locationManager?.requestLocation()
+    }
+}
 
+//MARK: - CLLocationManagerDelegate
+extension WeatherViewController: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let location = locations.last {
+            locationManager?.stopUpdatingLocation()
+            let lat = location.coordinate.latitude
+            let lon = location.coordinate.longitude
+            weatherManager?.fetchWeather(latitude: lat, longitude: lon)
+        }
+    }
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print(error)
+    }
+}
+
+//MARK: - UITextFieldDelegate
+extension WeatherViewController: UITextFieldDelegate {
     @IBAction func searchPressed(_ sender: UIButton) {
         let userLocationText = searchTextField.text ?? "Nothing entered"
         print("User entered: \(userLocationText)")
@@ -64,16 +92,24 @@ class WeatherViewController: UIViewController, UITextFieldDelegate, WeatherManag
             return false
         }
     }
-
+    
     /**
      - Note: This delegate method clears the text field upon press of the search button or Ruturn key
      */
     func textFieldDidEndEditing(_ textField: UITextField) {
-        if let city = searchTextField.text {
-            weatherManager.fetchWeather(cityName: city)
+        let city = searchTextField.text?.replacingOccurrences(of: " ", with: "+")
+        if let city = city {
+            weatherManager?.fetchWeather(cityName: city)
         }
         textField.text = ""
     }
+}
+
+//MARK: - WeatherManagerDelegate
+extension WeatherViewController: WeatherManagerDelegate {
+    /**
+     - Note: We are adopting the WeatherManagerDelegate protocol as defined in our WeatherManager file and conforming to it through our didUpdateWeather function which takes in our data from our WeatherModel.
+     */
     
     /**
      - Note: Because this is part of a completion handler (handles a long running task, most commonly network

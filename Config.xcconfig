@@ -1,0 +1,11 @@
+//
+//  Config.xcconfig
+//  Clima
+//
+//  Created by Robert Ranf on 4/16/21.
+//  Copyright © 2021 App Brewery. All rights reserved.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+OPENWEATHER_API_ID = 039de1f7c3eb63c700388ab529607ffc

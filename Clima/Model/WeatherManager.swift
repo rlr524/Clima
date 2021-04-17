@@ -7,22 +7,30 @@
  */
 
 import Foundation
+import CoreLocation
 
 protocol WeatherManagerDelegate {
     func didUpdateWeather(_ weatherManager: WeatherManager, weather: WeatherModel)
     func didFailWithError(error: Error)
 }
 
+let apiID = (Bundle.main.infoDictionary?["API_ID"]as?String)!
+
 struct WeatherManager {
-    let weatherURL = "https://api.openweathermap.org/data/2.5/weather?appid=039de1f7c3eb63c700388ab529607ffc&units=metric"
+    let weatherURL = "https://api.openweathermap.org/data/2.5/weather?appid=\(String(describing: apiID))&units=metric"
     
     var delegate: WeatherManagerDelegate?
     
-    // TODO: Need to account for spaces in city names
     func fetchWeather(cityName: String) {
         let urlString = "\(weatherURL)&q=\(cityName)"
         performRequest(with: urlString)
-        print("URI passed was: \(urlString) ")
+        print("URI passed was: \(urlString)")
+    }
+    
+    func fetchWeather(latitude: CLLocationDegrees, longitude: CLLocationDegrees) {
+        let urlString = "\(weatherURL)&lat=\(latitude)&lon=\(longitude)"
+        performRequest(with: urlString)
+        print("URI passed was: \(urlString)")
     }
     
     /**
